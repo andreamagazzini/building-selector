@@ -1,24 +1,49 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, useMapEvents, useMap } from 'react-leaflet'
 
 import L, { LatLngTuple } from "leaflet";
 
-// Leaflet easy button
-import "leaflet-easybutton/src/easy-button";
-import "leaflet-easybutton/src/easy-button.css";
+import MarkerWithImage from "./MarkerWithImage";
+
+// Leaflet geosearch
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-geosearch/dist/geosearch.css';
+
+// Leaflet default compatibility (to show default icons correctly)
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
+import 'leaflet-defaulticon-compatibility';
 
 // Leaflet style
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
-import 'leaflet-defaulticon-compatibility';
-import MarkerWithImage from "./MarkerWithImage";
+
+const SearchField = () => {
+  let hasBeenAdded = useRef(false);
+  const map = useMap();
+
+  useEffect(() => {
+    if (hasBeenAdded.current) {
+      return;
+    }
+    hasBeenAdded.current = true
+    const provider = new OpenStreetMapProvider();
+    // @ts-ignore
+    const searchControl = new GeoSearchControl({
+      provider: provider,
+    });
+    map.addControl(searchControl);
+  }, [map]);
+
+  return null;
+};
+
+
 
 // Location Marker component
 const LocationMarker = () => {
   const [markers, setMarkers] = useState<any[]>([]);
-  
+
 
   useMapEvents({
     click(e) {
@@ -43,18 +68,14 @@ const LeafletMap = () => {
     const locateMe = () => {
       map.locate().on("locationfound", function (e: any) {
         setPosition(e.latlng);
-        map.flyTo(e.latlng, map.getZoom());
+        map.setView(e.latlng);
       });
     }
 
     locateMe();
-
-    L.easyButton("fa-map-marker", () => {
-      locateMe()
-    }).addTo(map);
   }, [map]);
 
-  
+
   return (
     <div className="App">
       <MapContainer
@@ -67,6 +88,7 @@ const LeafletMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 
             Data mining by [<a href="http://overpass-api.de/">Overpass API</a>]'
         />
+        <SearchField />
         <LocationMarker />
       </MapContainer>
     </div>
