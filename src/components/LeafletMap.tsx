@@ -3,13 +3,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { MapContainer, TileLayer, useMapEvents, useMap } from 'react-leaflet'
 
-import L, { LatLngTuple } from "leaflet";
+import { LatLngTuple } from "leaflet";
 
 import MarkerWithImage from "./MarkerWithImage";
 
 // Leaflet geosearch
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
+import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 
 // Leaflet default compatibility (to show default icons correctly)
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
@@ -17,6 +18,7 @@ import 'leaflet-defaulticon-compatibility';
 
 // Leaflet style
 import 'leaflet/dist/leaflet.css';
+import { getMarkers } from "../services/Firebase";
 
 const SearchField = () => {
   let hasBeenAdded = useRef(false);
@@ -41,19 +43,30 @@ const SearchField = () => {
 
 
 // Location Marker component
-const LocationMarker = () => {
-  const [markers, setMarkers] = useState<any[]>([]);
+const Markers = () => {
+  const [temporaryMarker, setTemporaryMarker] = useState<any>();
+  const [fetchedMarkers, setFetchedMarkers] = useState<any[]>([]);
 
+  useEffect(() => {
+    getMarkers().then((markers) => {
+      setFetchedMarkers(markers);
+    })
+  }, [])
 
   useMapEvents({
     click(e) {
-      setMarkers([...markers, <MarkerWithImage position={e.latlng} />])
+      setTemporaryMarker({
+        id: 0,
+        position: [e.latlng.lat, e.latlng.lng]
+      })
     },
   })
 
   return <>
     {
-      markers.map((el) => el)
+      [temporaryMarker, ...fetchedMarkers].filter(Boolean).map((marker, index) => (
+        <MarkerWithImage key={marker.id} position={marker.position} type={marker.type} isTemporary={marker.id === 0} />
+      ))
     }
   </>;
 }
@@ -88,8 +101,15 @@ const LeafletMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 
             Data mining by [<a href="http://overpass-api.de/">Overpass API</a>]'
         />
+        {/* <EsriLeafletGeoSearch useMapBounds={false} position="topright" providers={{
+          arcgisOnlineProvider: {
+            apiKey: process.env.ARCGIS_API_KEY,
+            label: "ArcGIS Online Results",
+            maxResults: 10
+          },
+        }} /> */}
         <SearchField />
-        <LocationMarker />
+        <Markers />
       </MapContainer>
     </div>
   );
