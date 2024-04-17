@@ -36,7 +36,7 @@ export enum MarkerType {
 export interface IMarker {
   id: string,
   address: string,
-  position: LatLng,
+  position: number[],
   imgs?: string[],
   type: MarkerType
 }
@@ -62,7 +62,6 @@ export const getMarkers = async () => {
 }
 
 export const addNewMarker = async (marker: IMarker) => {
-  console.log(marker);
   // Add a new document in collection "cities"
   await setDoc(doc(db, COLLECTION_MARKERS, marker.id), marker);
 }

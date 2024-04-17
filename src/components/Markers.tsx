@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getMarkers } from "../services/Firebase";
 import { useMapEvents } from "react-leaflet";
 import MarkerWithImage from "./MarkerWithImage";
+import { LatLng } from "leaflet";
 
 // Location Marker component
 const Markers = () => {
@@ -18,7 +19,7 @@ const Markers = () => {
     click(e) {
       setTemporaryMarker({
         id: 0,
-        position: e.latlng
+        position: [e.latlng.lat, e.latlng.lng]
       })
       getMarkers().then((markers) => {
         setFetchedMarkers(markers);
@@ -28,8 +29,13 @@ const Markers = () => {
 
   return <>
     {
-      [temporaryMarker, ...fetchedMarkers].filter(Boolean).map((marker, index) => (
-        <MarkerWithImage key={marker.id} position={marker.position} type={marker.type} address={marker.address} isTemporary={marker.id === 0} />
+      [temporaryMarker, ...fetchedMarkers].filter(Boolean).map((marker) => (
+        <MarkerWithImage 
+          key={marker.id} 
+          position={new LatLng(marker.position[0], marker.position[1])} 
+          type={marker.type} 
+          address={marker.address} 
+          isTemporary={marker.id === 0} />
       ))
     }
   </>;

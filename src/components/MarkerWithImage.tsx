@@ -12,11 +12,11 @@ interface Props {
 
 const MarkerWithImage: FC<Props> = ({ position, address, type = MarkerType.DONE, isTemporary = false }) => {
   const [image, setImage] = useState("");
-  const [fetchedAddress, setFetchedAddress] = useState(address);
-  const [id, setId] = useState("");
+  const [fetchedAddress, setFetchedAddress] = useState(address || `${position.lat}, ${position.lng}`);
+  const [id, setId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (fetchedAddress) return;
+    if (id) return;
 
     const reverseGeocodingUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.lat}&lon=${position.lng}&zoom=18&addressdetails=1`;
     fetch(reverseGeocodingUrl)
@@ -28,7 +28,7 @@ const MarkerWithImage: FC<Props> = ({ position, address, type = MarkerType.DONE,
         setId(responseJson.place_id)
       })
       .catch(error => console.log('Reverse Geocode', error));
-  }, [position, fetchedAddress])
+  }, [position, id])
 
   const onImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const target = e.target;
@@ -39,25 +39,27 @@ const MarkerWithImage: FC<Props> = ({ position, address, type = MarkerType.DONE,
   }
 
   const onMarkerPlaced = async () => {
+    if (!id) return;
     await addNewMarker({
-    id: id.toString(),
-    position,
-    address: fetchedAddress || `${position.lat}, ${position.lng}`,
-    type
-  })
-}
+      id: id.toString(),
+      position: [position.lat, position.lng],
+      address: fetchedAddress,
+      type
+    }).catch((e) => alert(e))
+    setId(null);
+  }
 
   return (
     <Marker position={position}>
       <Popup>
-        <span>{address}</span>
+        <span>{fetchedAddress}</span>
         {
           image &&
           <img width="200" alt="uploaded" src={image} />
         }
         <input type="file" name="myImage" onChange={onImageChange} />
         {
-          isTemporary && <button onClick={onMarkerPlaced}>Place</button>
+          isTemporary && id && <button onClick={onMarkerPlaced}>Place</button>
         }
       </Popup>
     </Marker>
