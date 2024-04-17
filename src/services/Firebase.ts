@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
+import { LatLng } from "leaflet";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -35,7 +36,7 @@ export enum MarkerType {
 export interface IMarker {
   id: string,
   address: string,
-  position: number[],
+  position: LatLng,
   imgs?: string[],
   type: MarkerType
 }

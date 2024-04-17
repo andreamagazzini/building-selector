@@ -1,31 +1,34 @@
 import { ChangeEventHandler, FC, useEffect, useState } from "react";
 import { Marker, Popup } from "react-leaflet"
 import { MarkerType, addNewMarker } from "../services/Firebase";
+import { LatLng } from "leaflet";
 
 interface Props {
-  position: number[],
+  address?: string,
+  position: LatLng,
   type?: MarkerType,
   isTemporary: boolean
 }
 
-const MarkerWithImage: FC<Props> = ({ position, type = MarkerType.DONE, isTemporary = false }) => {
+const MarkerWithImage: FC<Props> = ({ position, address, type = MarkerType.DONE, isTemporary = false }) => {
   const [image, setImage] = useState("");
-  const [address, setAddress] = useState("");
+  const [fetchedAddress, setFetchedAddress] = useState(address);
   const [id, setId] = useState("");
-  const [isPlaced, setIsPlaced] = useState(isTemporary ? false : true);
 
   useEffect(() => {
-    const reverseGeocodingUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}&zoom=18&addressdetails=1`;
+    if (fetchedAddress) return;
+
+    const reverseGeocodingUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.lat}&lon=${position.lng}&zoom=18&addressdetails=1`;
     fetch(reverseGeocodingUrl)
       .then(response => {
         return response.json();
       })
       .then(responseJson => {
-        setAddress(responseJson.display_name)
+        setFetchedAddress(responseJson.display_name)
         setId(responseJson.place_id)
       })
       .catch(error => console.log('Reverse Geocode', error));
-  }, [position])
+  }, [position, fetchedAddress])
 
   const onImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const target = e.target;
@@ -39,14 +42,13 @@ const MarkerWithImage: FC<Props> = ({ position, type = MarkerType.DONE, isTempor
     await addNewMarker({
     id: id.toString(),
     position,
-    address,
+    address: fetchedAddress || `${position.lat}, ${position.lng}`,
     type
   })
-  setIsPlaced(true);
 }
 
   return (
-    <Marker position={{lat: position[0], lng: position[1]}}>
+    <Marker position={position}>
       <Popup>
         <span>{address}</span>
         {
@@ -55,7 +57,7 @@ const MarkerWithImage: FC<Props> = ({ position, type = MarkerType.DONE, isTempor
         }
         <input type="file" name="myImage" onChange={onImageChange} />
         {
-          isTemporary && !isPlaced && <button onClick={onMarkerPlaced}>Place</button>
+          isTemporary && <button onClick={onMarkerPlaced}>Place</button>
         }
       </Popup>
     </Marker>
