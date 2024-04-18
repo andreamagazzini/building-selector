@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMarkers } from "../services/Firebase";
+import { IMarker, deleteMarkerById, getMarkers } from "../services/Firebase";
 import { useMap, useMapEvents } from "react-leaflet";
 import MarkerWithImage from "./MarkerWithImage";
 import { LatLng } from "leaflet";
@@ -39,15 +39,25 @@ const Markers = () => {
     changeMarkerPosition(position)
   })
 
+  const onMarkerRemoved = async (marker: IMarker) => {
+    await deleteMarkerById(marker.id);
+
+    setTemporaryMarker({
+      id: "0",
+      position: marker.position
+    })
+  }
+
   return <>
     {
       [temporaryMarker, ...fetchedMarkers].filter(Boolean).map((marker) => (
-        <MarkerWithImage 
-          key={marker.id} 
-          position={new LatLng(marker.position[0], marker.position[1])} 
-          type={marker.type} 
-          address={marker.address} 
-          id={marker.id} 
+        <MarkerWithImage
+          key={marker.id}
+          position={new LatLng(marker.position[0], marker.position[1])}
+          type={marker.type}
+          address={marker.address}
+          id={marker.id}
+          onMarkerRemoved={onMarkerRemoved}
         />
       ))
     }

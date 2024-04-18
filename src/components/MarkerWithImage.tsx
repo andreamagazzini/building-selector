@@ -1,5 +1,5 @@
 import { ChangeEventHandler, FC, useEffect, useState } from "react";
-import { MarkerType, addNewMarker } from "../services/Firebase";
+import { IMarker, MarkerType, addNewMarker } from "../services/Firebase";
 import { LatLng, divIcon } from "leaflet";
 import { Marker, Popup } from "react-leaflet";
 import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
@@ -9,9 +9,10 @@ interface Props {
   id?: string,
   address?: string,
   type?: MarkerType,
+  onMarkerRemoved: (marker: IMarker) => void
 }
 
-const MarkerWithImage: FC<Props> = ({ position, address, type, id = "0" }) => {
+const MarkerWithImage: FC<Props> = ({ position, address, type, id = "0", onMarkerRemoved }) => {
   const [image, setImage] = useState("");
   const [fetchedAddress, setFetchedAddress] = useState(address || `${position.lat}, ${position.lng}`);
   const [fetchedId, setFetchedId] = useState<string>(id);
@@ -66,8 +67,10 @@ const MarkerWithImage: FC<Props> = ({ position, address, type, id = "0" }) => {
         }
         <input type="file" name="myImage" onChange={onImageChange} />
         {
-          id === "0" && fetchedId !== "0" && 
+          id === "0" && fetchedId !== "0" ? 
           <button className="bg-green-700 text-white p-3 rounded-xl" onClick={onMarkerPlaced}>Place</button>
+          :
+          <button className="bg-red-700 text-white p-3 rounded-xl" onClick={() => onMarkerRemoved({position: [position.lat, position.lng], id: fetchedId, address: fetchedAddress, type: type || MarkerType.DONE })}>Remove</button>
         }
         </div>
       </Popup>

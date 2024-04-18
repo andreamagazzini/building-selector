@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import { collection, deleteDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -63,4 +63,8 @@ export const getMarkers = async () => {
 export const addNewMarker = async (marker: IMarker) => {
   // Add a new document in collection "cities"
   await setDoc(doc(db, COLLECTION_MARKERS, marker.id), marker);
+}
+
+export const deleteMarkerById = async (id: string) => {
+  await deleteDoc(doc(db, COLLECTION_MARKERS, id));
 }
