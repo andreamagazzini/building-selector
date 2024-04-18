@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMarkers } from "../services/Firebase";
-import { useMapEvents } from "react-leaflet";
+import { useMap, useMapEvents } from "react-leaflet";
 import MarkerWithImage from "./MarkerWithImage";
 import { LatLng } from "leaflet";
 
@@ -9,23 +9,34 @@ const Markers = () => {
   const [temporaryMarker, setTemporaryMarker] = useState<any>();
   const [fetchedMarkers, setFetchedMarkers] = useState<any[]>([]);
 
+  const map = useMap();
+
   useEffect(() => {
     getMarkers().then((markers) => {
       setFetchedMarkers(markers);
     })
   }, [])
 
+  const changeMarkerPosition = (position: LatLng) => {
+    console.log(position);
+    setTemporaryMarker({
+      id: "0",
+      position: [position.lat, position.lng]
+    })
+    getMarkers().then((markers) => {
+      setFetchedMarkers(markers);
+    })
+  }
+
   useMapEvents({
     click(e) {
-      console.log(e);
-      setTemporaryMarker({
-        id: "0",
-        position: [e.latlng.lat, e.latlng.lng]
-      })
-      getMarkers().then((markers) => {
-        setFetchedMarkers(markers);
-      })
+      changeMarkerPosition(e.latlng);
     },
+  })
+
+  map.on('geosearch/showlocation', (e: any) => {
+    const position = new LatLng(e.location.y, e.location.x);
+    changeMarkerPosition(position)
   })
 
   return <>

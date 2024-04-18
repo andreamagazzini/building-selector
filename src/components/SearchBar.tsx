@@ -1,11 +1,10 @@
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
-import MarkerWithImage from "./MarkerWithImage";
 
 
 const SearchBar = () => {
-  let hasBeenAdded = useRef(false);
+  const hasBeenAdded = useRef(false);
   const map = useMap();
 
   useEffect(() => {
@@ -17,7 +16,8 @@ const SearchBar = () => {
     // @ts-ignore
     const searchControl = new GeoSearchControl({
       provider: provider,
-      marker: MarkerWithImage
+      showMarker: false,
+      showPopup: false
     });
     map.addControl(searchControl);
   }, [map]);

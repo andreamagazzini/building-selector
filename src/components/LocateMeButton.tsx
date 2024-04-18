@@ -3,11 +3,7 @@ import { useMap } from "react-leaflet";
 
 import L from "leaflet";
 
-// Leaflet easy button
-import "leaflet-easybutton/src/easy-button";
-import "leaflet-easybutton/src/easy-button.css";
-
-import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
+import { faMapPin } from "@fortawesome/free-solid-svg-icons";
 
 const LocateMeButton = () => {
   const hasBeenAdded = useRef(false);
@@ -35,12 +31,10 @@ const LocateMeButton = () => {
           locateMe()
         });
 
-        container.title = "Title";
-        button.innerHTML = `<svg viewBox="0 0 500 700" width="10" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="${typeof faLocationPin.icon[4] === "string" ? faLocationPin.icon[4] : faLocationPin.icon[4].find(Boolean)}" /></svg>`
+        button.innerHTML = `<svg viewBox="0 0 400 400" width="10" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="${typeof faMapPin.icon[4] === "string" ? faMapPin.icon[4] : faMapPin.icon[4].find(Boolean)}" /></svg>`
 
         return container;
       },
-      onRemove: function () { },
     });
 
     // @ts-ignore
