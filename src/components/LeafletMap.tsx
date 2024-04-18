@@ -17,6 +17,7 @@ import 'leaflet-defaulticon-compatibility';
 // Leaflet style
 import 'leaflet/dist/leaflet.css';
 import Markers from "./Markers";
+import { MarkerLayer } from "react-leaflet-marker";
 
 
 const LeafletMap = () => {
@@ -49,7 +50,9 @@ const LeafletMap = () => {
             Data mining by [<a href="http://overpass-api.de/">Overpass API</a>]'
         />
         <SearchBar />
-        <Markers />
+        <MarkerLayer>
+          <Markers />
+        </MarkerLayer>
       </MapContainer>
     </div>
   );

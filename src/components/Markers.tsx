@@ -17,8 +17,9 @@ const Markers = () => {
 
   useMapEvents({
     click(e) {
+      console.log(e);
       setTemporaryMarker({
-        id: 0,
+        id: "0",
         position: [e.latlng.lat, e.latlng.lng]
       })
       getMarkers().then((markers) => {
@@ -35,7 +36,8 @@ const Markers = () => {
           position={new LatLng(marker.position[0], marker.position[1])} 
           type={marker.type} 
           address={marker.address} 
-          isTemporary={marker.id === 0} />
+          id={marker.id} 
+        />
       ))
     }
   </>;
