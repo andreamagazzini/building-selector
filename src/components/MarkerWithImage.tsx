@@ -1,9 +1,8 @@
 import { ChangeEventHandler, FC, useEffect, useState } from "react";
 import { MarkerType, addNewMarker } from "../services/Firebase";
-import { Icon, LatLng, divIcon } from "leaflet";
+import { LatLng, divIcon } from "leaflet";
 import { Marker, Popup } from "react-leaflet";
 import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   position: LatLng,
@@ -56,18 +55,21 @@ const MarkerWithImage: FC<Props> = ({ position, address, type, id = "0" }) => {
   return (
     <Marker
       position={position}
-      icon={divIcon({ html: `<svg fill="${type === MarkerType.DONE ? "green" : "blue"}" style="margin-left:-10px;margin-top:-10px" viewBox="0 0 500 700" width="40" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="${typeof faLocationPin.icon[4] === "string" ? faLocationPin.icon[4] : faLocationPin.icon[4].find(Boolean)}" /></svg>` }) }
+      icon={divIcon({ html: `<svg fill="${type === MarkerType.DONE ? "green" : "blue"}" style="margin-left:-10px;margin-top:-10px" viewBox="0 0 500 700" width="40" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="${typeof faLocationPin.icon[4] === "string" ? faLocationPin.icon[4] : faLocationPin.icon[4].find(Boolean)}" /></svg>` })}
     >
       <Popup>
-      <span>{fetchedAddress}</span>
-              {
-                image &&
-                <img width="200" alt="uploaded" src={image} />
-              }
-              <input type="file" name="myImage" onChange={onImageChange} />
-              {
-                id === "0" && fetchedId !== "0" && <button onClick={onMarkerPlaced}>Place</button>
-              }
+        <div className="flex flex-col gap-5 p-5">
+        <span>{fetchedAddress}</span>
+        {
+          image &&
+          <img width="200" alt="uploaded" src={image} />
+        }
+        <input type="file" name="myImage" onChange={onImageChange} />
+        {
+          id === "0" && fetchedId !== "0" && 
+          <button className="bg-green-700 text-white p-3 rounded-xl" onClick={onMarkerPlaced}>Place</button>
+        }
+        </div>
       </Popup>
     </Marker>
   )
