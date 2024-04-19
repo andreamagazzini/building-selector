@@ -1,10 +1,8 @@
-import React from 'react';
-import LeafletMap from './components/LeafletMap';
+import React from "react";
+import LeafletMap from "./components/LeafletMap";
 
 function App() {
-  return (
-    <LeafletMap />
-  );
+  return <LeafletMap />;
 }
 
 export default App;
